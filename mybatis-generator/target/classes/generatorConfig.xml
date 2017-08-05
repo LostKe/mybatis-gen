@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<!--这个文件只有在开发阶段有用,用于在从mysql数据库生成映射文件跟model的定义-->
+<generatorConfiguration>
+    <properties resource="generator.properties"/>
+
+    <classPathEntry location="${jdbc.driver}"/>
+
+    <!--
+    关于 targetRuntime >>
+        更新的时候使用 MyBatis3 避免覆盖 cust.xml
+        新表使用 com.hhly.mybatis.codegen.IntrospectedTableMyBatis3Impl, 会生成自定义的 xml.
+    -->
+    <context id="MySqlTables" targetRuntime="com.hhly.mybatis.codegen.IntrospectedTableMyBatis3Impl">
+        <!--定义 mysql 的转义符, 结合 table 标签的 delimitIdentifiers, delimitAllColumns 使用-->
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+
+        <!-- 不使用 java 的序列化, json 的效率会更好一些, 而且与平台无关 -->
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+        <plugin type="com.hhly.mybatisgenpluginext.LombokPlugin"/>
+        <plugin type="com.hhly.mybatisgenpluginext.ModelCommentPlugin"/>
+
+        <commentGenerator>
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+
+        <jdbcConnection driverClass="${jdbc.driverclass}" connectionURL="${jdbc.connectionurl}"
+                        userId="${jdbc.user}" password="${jdbc.password}"/>
+
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="true"/>
+        </javaTypeResolver>
+
+        <!--generate Model-->
+        <javaModelGenerator targetPackage="${targetModel}" targetProject="${targetProject}">
+            <property name="enableSubPackages" value="true"/>
+            <!--<property name="trimStrings" value="true" />-->
+        </javaModelGenerator>
+
+        <!--generate xml-->
+        <sqlMapGenerator targetPackage="${targetXml}" targetProject="${targetProjectXml}">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <!-- generate Mapper -->
+        <!-- 用这个是产生 属性 != null 的
+        <javaClientGenerator type="XMLMAPPER" targetPackage="${targetRepository}" targetProject="${targetProject}">
+            <property name="enableSubPackages" value="true" />
+        </javaClientGenerator>
+        -->
+        <!-- 用这个是用 mybatis 的 ognl 函数判断对象是否为空的. @Ognl@isNotEmpty -->
+        <javaClientGenerator type="com.hhly.mybatis.codegen.xmlmapper.YjsJavaMapperGenerator"
+                             targetPackage="${targetRepository}" targetProject="${targetProject}">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+
+        <table tableName="T_PROJECT_CASE_TYPE" domainObjectName="ProjectCaseType"  escapeWildcards="true"
+               enableCountByExample="true" enableUpdateByExample="true" enableDeleteByExample="true"
+               enableSelectByExample="true" selectByExampleQueryId="true"
+               delimitIdentifiers="true" delimitAllColumns="true"/>
+
+    </context>
+</generatorConfiguration>
